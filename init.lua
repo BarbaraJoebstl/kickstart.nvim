@@ -63,205 +63,13 @@ vim.opt.rtp:prepend(lazypath)
 -- [[ Configure plugins ]]
 -- NOTE: Here is where you install your plugins.
 --  You can configure plugins using the `config` key.
---
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
-  -- NOTE: First, some plugins that don't require any configuration
-
-  -- Git related plugins
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
-
+    --For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
+  { import = 'custom.plugins' },
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
-  {
-    'stevearc/oil.nvim',
-    config = function()
-      vim.keymap.set("n", "<BS>", "<CMD>Oil<CR>", { desc = "Open parent directory" })
-
-      require("oil").setup({
-        -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
-        -- Set to false if you still want to use netrw.
-        default_file_explorer = true,
-        -- Id is automatically added at the beginning, and name at the end
-        -- See :help oil-columns
-        columns = {
-          -- "icon",
-          -- "permissions",
-          -- "size",
-          -- "mtime",
-        },
-        -- Buffer-local options to use for oil buffers
-        buf_options = {
-          buflisted = false,
-          bufhidden = "hide",
-        },
-        -- Window-local options to use for oil buffers
-        win_options = {
-          wrap = false,
-          signcolumn = "no",
-          cursorcolumn = false,
-          foldcolumn = "0",
-          spell = false,
-          list = false,
-          conceallevel = 3,
-          concealcursor = "nvic",
-        },
-        -- Send deleted files to the trash instead of permanently deleting them (:help oil-trash)
-        delete_to_trash = false,
-        -- Skip the confirmation popup for simple operations
-        skip_confirm_for_simple_edits = false,
-        -- Selecting a new/moved/renamed file or directory will prompt you to save changes first
-        prompt_save_on_select_new_entry = true,
-        -- Oil will automatically delete hidden buffers after this delay
-        -- You can set the delay to false to disable cleanup entirely
-        -- Note that the cleanup process only starts when none of the oil buffers are currently displayed
-        cleanup_delay_ms = 2000,
-        -- Set to true to autosave buffers that are updated with LSP willRenameFiles
-        -- Set to "unmodified" to only save unmodified buffers
-        lsp_rename_autosave = false,
-        -- Constrain the cursor to the editable parts of the oil buffer
-        -- Set to `false` to disable, or "name" to keep it on the file names
-        constrain_cursor = "editable",
-        -- Keymaps in oil buffer. Can be any value that `vim.keymap.set` accepts OR a table of keymap
-        -- options with a `callback` (e.g. { callback = function() ... end, desc = "", mode = "n" })
-        -- Additionally, if it is a string that matches "actions.<name>",
-        -- it will use the mapping at require("oil.actions").<name>
-        -- Set to `false` to remove a keymap
-        -- See :help oil-actions for a list of all available actions
-        keymaps = {
-          ["g?"] = "actions.show_help",
-          ["<CR>"] = "actions.select",
-          ["<C-s>"] = "actions.select_vsplit",
-          ["<C-h>"] = "actions.select_split",
-          ["<C-t>"] = "actions.select_tab",
-          ["<C-p>"] = "actions.preview",
-          ["<C-c>"] = "actions.close",
-          ["<C-l>"] = "actions.refresh",
-          ["<BS>"] = "actions.parent",
-          ["_"] = "actions.open_cwd",
-          ["`"] = "actions.cd",
-          ["~"] = "actions.tcd",
-          ["gs"] = "actions.change_sort",
-          ["gx"] = "actions.open_external",
-          ["g."] = "actions.toggle_hidden",
-          ["g\\"] = "actions.toggle_trash",
-        },
-        -- Set to false to disable all of the above keymaps
-        use_default_keymaps = true,
-        view_options = {
-          -- Show files and directories that start with "."
-          show_hidden = true,
-          -- This function defines what is considered a "hidden" file
-          is_hidden_file = function(name)
-            return vim.startswith(name, ".")
-          end,
-          -- This function defines what will never be shown, even when `show_hidden` is set
-          is_always_hidden = function(name)
-            return name == ".."
-          end,
-          sort = {
-            -- sort order can be "asc" or "desc"
-            -- see :help oil-columns to see which columns are sortable
-            { "type", "asc" },
-            { "name", "asc" },
-          },
-        },
-        -- Configuration for the floating window in oil.open_float
-        float = {
-          -- Padding around the floating window
-          padding = 2,
-          max_width = 0,
-          max_height = 0,
-          border = "rounded",
-          win_options = {
-            winblend = 0,
-          },
-          -- This is the config that will be passed to nvim_open_win.
-          -- Change values here to customize the layout
-          override = function(conf)
-            return conf
-          end,
-        },
-        -- Configuration for the actions floating preview window
-        preview = {
-          -- Width dimensions can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
-          -- min_width and max_width can be a single value or a list of mixed integer/float types.
-          -- max_width = {100, 0.8} means "the lesser of 100 columns or 80% of total"
-          max_width = 0.9,
-          -- min_width = {40, 0.4} means "the greater of 40 columns or 40% of total"
-          min_width = { 40, 0.4 },
-          -- optionally define an integer/float for the exact width of the preview window
-          width = nil,
-          -- Height dimensions can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
-          -- min_height and max_height can be a single value or a list of mixed integer/float types.
-          -- max_height = {80, 0.9} means "the lesser of 80 columns or 90% of total"
-          max_height = 0.9,
-          -- min_height = {5, 0.1} means "the greater of 5 columns or 10% of total"
-          min_height = { 5, 0.1 },
-          -- optionally define an integer/float for the exact height of the preview window
-          height = nil,
-          border = "rounded",
-          win_options = {
-            winblend = 0,
-          },
-          -- Whether the preview window is automatically updated when the cursor is moved
-          update_on_cursor_moved = true,
-        },
-        -- Configuration for the floating progress window
-        progress = {
-          max_width = 0.9,
-          min_width = { 40, 0.4 },
-          width = nil,
-          max_height = { 10, 0.9 },
-          min_height = { 5, 0.1 },
-          height = nil,
-          border = "rounded",
-          minimized_border = "none",
-          win_options = {
-            winblend = 0,
-          },
-        },
-      })
-    end,
-  },
-
-  -- NOTE: This is where your plugins related to LSP can be installed.
-  --  The configuration is done below. Search for lspconfig to find it below.
-  {
-    -- LSP Configuration & Plugins
-    'neovim/nvim-lspconfig',
-    dependencies = {
-      -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', config = true },
-      'williamboman/mason-lspconfig.nvim',
-
-      -- Useful status updates for LSP
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
-
-      -- Additional lua configuration, makes nvim stuff amazing!
-      'folke/neodev.nvim',
-    },
-  },
-
-  {
-    -- Autocompletion
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
-
-      -- Adds LSP completion capabilities
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-
-      -- Adds a number of user-friendly snippets
-      'rafamadriz/friendly-snippets',
-    },
-  },
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim',  opts = {} },
@@ -340,39 +148,7 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
-
-  {
-    -- Set lualine as statusline
-    'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = 'onedark',
-        component_separators = '|',
-        section_separators = '',
-      },
-    },
-  },
-
-  {
-    -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
-    main = 'ibl',
-    opts = {},
-  },
-
-  -- "gc" to comment visual regions/lines
+ -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
@@ -416,8 +192,7 @@ require('lazy').setup({
   --    up-to-date with whatever is in the kickstart repo.
   --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
+
 }, {})
 
 -- [[ Setting options ]]
@@ -809,100 +584,102 @@ cmp.setup {
   },
 }
 
-if vim.g.neovide then
+if vim.loop.os_uname().sysname == 'Darwin' then
   vim.o.shell = '/opt/homebrew/bin/fish'
-  -- Put anything you want to happen only in Neovide here
-  vim.g.neovide_scale_factor = 1.6
-  local change_scale_factor = function(delta)
-    vim.g.neovide_scale_factor = vim.g.neovide_scale_factor * delta
-  end
-  vim.keymap.set('n', '<D-=>', function()
-    change_scale_factor(1.10)
-  end)
-  vim.keymap.set('n', '<D-->', function()
-    change_scale_factor(1 / 1.10)
-  end)
-  --https://github.com/vim/vim/blob/master/runtime/mswin.vim
-  vim.keymap.set('n', '<D-s>', ':update<CR>')
-  vim.keymap.set('v', '<D-s>', '<C-C>:update<CR>')
-  vim.keymap.set('i', '<D-s>', '<Esc>:update<CR>gi')
-  vim.keymap.set('v', '<D-c>', '"+y')
-  vim.keymap.set('v', '<D-x>', '"+x')
-  vim.keymap.set('n', '<C-p>', '<C-]>')
-  vim.keymap.set({ 'i', 'c' }, '<D-v>', '<C-r>+')
-  vim.keymap.set('', '<D-v>', '"+gP')
-  vim.keymap.set('v', '<BS>', 'd')
-  -- vim.keymap.set('n', '<BS>', '<C-^>')
-
-  -- tabs
-  vim.keymap.set('n', '<D-1>', '1gt')
-  vim.keymap.set('n', '<D-2>', '2gt')
-  vim.keymap.set('n', '<D-3>', '3gt')
-  vim.keymap.set('n', '<D-4>', '4gt')
-  vim.keymap.set('n', '<D-5>', '5gt')
-  vim.keymap.set('n', '<D-[>', ':tabprevious<CR>')
-  vim.keymap.set('n', '<D-]>', ':tabnext<CR>')
-  vim.keymap.set('n', '<D-t>', ':tabnew<CR>')
-  vim.keymap.set('n', '<D-w>', ':close<CR>')
-
-  -- windows
-  vim.keymap.set('n', '<D-d>', ':vsp<CR>')
-  vim.keymap.set('n', '<C-D-d>', ':sp<CR>')
-  vim.keymap.set('t', '<C-h>', '<C-\\><C-N><C-w>h')
-  vim.keymap.set('t', '<C-j>', '<C-\\><C-N><C-w>j')
-  vim.keymap.set('t', '<C-k>', '<C-\\><C-N><C-w>k')
-  vim.keymap.set('t', '<C-l>', '<C-\\><C-N><C-w>l')
-  vim.keymap.set('i', '<C-h>', '<C-\\><C-N><C-w>h')
-  vim.keymap.set('i', '<C-j>', '<C-\\><C-N><C-w>j')
-  vim.keymap.set('i', '<C-k>', '<C-\\><C-N><C-w>k')
-  vim.keymap.set('i', '<C-l>', '<C-\\><C-N><C-w>l')
-  vim.keymap.set('n', '<C-h>', '<C-w>h')
-  vim.keymap.set('n', '<C-j>', '<C-w>j')
-  vim.keymap.set('n', '<C-k>', '<C-w>k')
-  vim.keymap.set('n', '<C-l>', '<C-w>l')
-
-  -- new app
-  vim.keymap.set('n', '<D-n>', '<CMD>silent !neovide<CR>')
-
-  -- terminal
-  vim.keymap.set('t', '<D-BS>', '<C-\\><C-n>')
-  vim.api.nvim_create_autocmd({ "TermOpen" }, {
-    callback = function()
-      vim.cmd('startinsert')
-      vim.o.showmode = false
-    end
-  })
-
-  vim.g.neovide_padding_top = 10
-  vim.g.neovide_padding_bottom = 0
-  vim.g.neovide_padding_right = 0
-  vim.g.neovide_padding_left = 0
-  vim.g.neovide_hide_mouse_when_typing = true
-
-  vim.o.backup = false
-  vim.o.swapfile = false
-  vim.o.writebackup = false
-  vim.o.autoread = true
-  vim.o.autowrite = true
-  vim.o.autowriteall = true
-  vim.o.clipboard = "unnamedplus"
-  vim.o.tabstop = 2
-  vim.o.shiftwidth = 2
-  vim.o.softtabstop = 2
-  vim.o.expandtab = true
-  vim.o.relativenumber = true
-  vim.o.number = true
-  -- additional filetypes
-  vim.filetype.add({
-    extension = {
-      templ = "templ",
-    },
-  })
-  vim.filetype.add({
-    extension = {
-      tf = "terraform",
-    },
-  })
+elseif vim.o.shell == 'Linux' then
+  vim.o.shell = '/home/linuxbrew/.linuxbrew/bin/fish'
 end
+-- Put anything you want to happen only in Neovide here
+vim.g.neovide_scale_factor = 1.6
+local change_scale_factor = function(delta)
+  vim.g.neovide_scale_factor = vim.g.neovide_scale_factor * delta
+end
+vim.keymap.set('n', '<D-=>', function()
+  change_scale_factor(1.10)
+end)
+vim.keymap.set('n', '<D-->', function()
+  change_scale_factor(1 / 1.10)
+end)
+--https://github.com/vim/vim/blob/master/runtime/mswin.vim
+vim.keymap.set('n', '<D-s>', ':update<CR>')
+vim.keymap.set('v', '<D-s>', '<C-C>:update<CR>')
+vim.keymap.set('i', '<D-s>', '<Esc>:update<CR>gi')
+vim.keymap.set('v', '<D-c>', '"+y')
+vim.keymap.set('v', '<D-x>', '"+x')
+vim.keymap.set('n', '<C-p>', '<C-]>')
+vim.keymap.set({ 'i', 'c' }, '<D-v>', '<C-r>+')
+vim.keymap.set('', '<D-v>', '"+gP')
+vim.keymap.set('v', '<BS>', 'd')
+-- vim.keymap.set('n', '<BS>', '<C-^>')
+
+-- tabs
+vim.keymap.set('n', '<D-1>', '1gt')
+vim.keymap.set('n', '<D-2>', '2gt')
+vim.keymap.set('n', '<D-3>', '3gt')
+vim.keymap.set('n', '<D-4>', '4gt')
+vim.keymap.set('n', '<D-5>', '5gt')
+vim.keymap.set('n', '<D-[>', ':tabprevious<CR>')
+vim.keymap.set('n', '<D-]>', ':tabnext<CR>')
+vim.keymap.set('n', '<D-t>', ':tabnew<CR>')
+vim.keymap.set('n', '<D-w>', ':close<CR>')
+
+-- windows
+vim.keymap.set('n', '<D-d>', ':vsp<CR>')
+vim.keymap.set('n', '<C-D-d>', ':sp<CR>')
+vim.keymap.set('t', '<C-h>', '<C-\\><C-N><C-w>h')
+vim.keymap.set('t', '<C-j>', '<C-\\><C-N><C-w>j')
+vim.keymap.set('t', '<C-k>', '<C-\\><C-N><C-w>k')
+vim.keymap.set('t', '<C-l>', '<C-\\><C-N><C-w>l')
+vim.keymap.set('i', '<C-h>', '<C-\\><C-N><C-w>h')
+vim.keymap.set('i', '<C-j>', '<C-\\><C-N><C-w>j')
+vim.keymap.set('i', '<C-k>', '<C-\\><C-N><C-w>k')
+vim.keymap.set('i', '<C-l>', '<C-\\><C-N><C-w>l')
+vim.keymap.set('n', '<C-h>', '<C-w>h')
+vim.keymap.set('n', '<C-j>', '<C-w>j')
+vim.keymap.set('n', '<C-k>', '<C-w>k')
+vim.keymap.set('n', '<C-l>', '<C-w>l')
+
+-- new app
+vim.keymap.set('n', '<D-n>', '<CMD>silent !neovide<CR>')
+
+-- terminal
+vim.keymap.set('t', '<D-BS>', '<C-\\><C-n>')
+vim.api.nvim_create_autocmd({ "TermOpen" }, {
+  callback = function()
+    vim.cmd('startinsert')
+    vim.o.showmode = false
+  end
+})
+
+vim.g.neovide_padding_top = 10
+vim.g.neovide_padding_bottom = 0
+vim.g.neovide_padding_right = 0
+vim.g.neovide_padding_left = 0
+vim.g.neovide_hide_mouse_when_typing = true
+
+vim.o.backup = false
+vim.o.swapfile = false
+vim.o.writebackup = false
+vim.o.autoread = true
+vim.o.autowrite = true
+vim.o.autowriteall = true
+vim.o.clipboard = "unnamedplus"
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+vim.o.softtabstop = 2
+vim.o.expandtab = true
+vim.o.relativenumber = true
+vim.o.number = true
+-- additional filetypes
+vim.filetype.add({
+  extension = {
+    templ = "templ",
+  },
+})
+vim.filetype.add({
+  extension = {
+    tf = "terraform",
+  },
+})
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
