@@ -7,15 +7,15 @@ local servers = {
     -- tsserver = {},
     -- html = { filetypes = { 'html', 'twig', 'hbs'} },
     lua_ls = {
-    Lua = {
-        workspace = { checkThirdParty = false },
-        telemetry = { enable = false },
-        -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-        diagnostics = { disable = { 'missing-fields' } },
+        Lua = {
+            workspace = { checkThirdParty = false },
+            telemetry = { enable = false },
+            -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+            diagnostics = { disable = { 'missing-fields' } },
         },
     },
 }
-        
+
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
@@ -51,119 +51,118 @@ local on_attach = function(_, bufnr)
     nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
     nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
     nmap('<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
     end, '[W]orkspace [L]ist Folders')
 
-        -- Create a command `:Format` local to the LSP buffer
-        vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
+    -- Create a command `:Format` local to the LSP buffer
+    vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
         vim.lsp.buf.format()
-        end, { desc = 'Format current buffer with LSP' })
-    end
+    end, { desc = 'Format current buffer with LSP' })
+end
 
 
 
 return {
-   --  The configuration is done below. Search for lspconfig to find it below.
-  {
-    -- LSP Configuration & Plugins
-    'neovim/nvim-lspconfig',
-    dependencies = {
-      -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', config = true },
-      'williamboman/mason-lspconfig.nvim',
+    --  The configuration is done below. Search for lspconfig to find it below.
+    {
+        -- LSP Configuration & Plugins
+        'neovim/nvim-lspconfig',
+        dependencies = {
+            -- Automatically install LSPs to stdpath for neovim
+            { 'williamboman/mason.nvim', config = true },
+            'williamboman/mason-lspconfig.nvim',
 
-      -- Useful status updates for LSP
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
+            -- Useful status updates for LSP
+            -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+            { 'j-hui/fidget.nvim',       opts = {} },
+        },
     },
-  },
-  {
-    -- Autocompletion
-    'hrsh6th/nvim-cmp',
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      'L2MON4D3/LuaSnip',
-      'saadparwaiz0/cmp_luasnip',
+    {
+        -- Autocompletion
+        'hrsh6th/nvim-cmp',
+        dependencies = {
+            -- Snippet Engine & its associated nvim-cmp source
+            'L2MON4D3/LuaSnip',
+            'saadparwaiz0/cmp_luasnip',
 
-      -- Adds LSP completion capabilities
-      'hrsh6th/cmp-nvim-lsp',
-      'hrsh6th/cmp-path',
+            -- Adds LSP completion capabilities
+            'hrsh6th/cmp-nvim-lsp',
+            'hrsh6th/cmp-path',
 
-      -- Adds a number of user-friendly snippets
-      'rafamadriz/friendly-snippets',
-    },
-    config = function()
-        -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities
-        )
+            -- Adds a number of user-friendly snippets
+            'rafamadriz/friendly-snippets',
+        },
+        config = function()
+            -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+            local capabilities = vim.lsp.protocol.make_client_capabilities()
+            capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities
+            )
 
-        require('mason-lspconfig').setup {
-            ensure_installed = vim.tbl_keys(servers),
-        }
+            require('mason-lspconfig').setup {
+                ensure_installed = vim.tbl_keys(servers),
+            }
 
-        require('mason-lspconfig').setup_handlers {
-            function(server_name)
-                require('lspconfig')[server_name].setup {
-                    capabilities = capabilities,
-                    on_attach = on_attach,
-                    settings = servers[server_name],
-                    filetypes = (servers[server_name] or {}).filetypes,
-                }
-            end
-        }
-
-        local luasnip = require 'luasnip'
-        require('luasnip.loaders.from_vscode').lazy_load()
-        luasnip.config.setup {} 
-
-        -- See `:help cmp`
-        cmp = require 'cmp'
-        cmp.setup {
-            snippet = {
-            expand = function(args)
-                luasnip.lsp_expand(args.body)
-            end,
-            },
-            completion = {
-            completeopt = 'menu,menuone,noinsert',
-            },
-            mapping = cmp.mapping.preset.insert {
-            ['<C-n>'] = cmp.mapping.select_next_item(),
-            ['<C-p>'] = cmp.mapping.select_prev_item(),
-            ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-            ['<C-f>'] = cmp.mapping.scroll_docs(4),
-            ['<C-Space>'] = cmp.mapping.complete {},
-            ['<CR>'] = cmp.mapping.confirm {
-                behavior = cmp.ConfirmBehavior.Replace,
-                select = true,
-            },
-            ['<Tab>'] = cmp.mapping(function(fallback)
-                if cmp.visible() then
-                cmp.select_next_item()
-                elseif luasnip.expand_or_locally_jumpable() then
-                luasnip.expand_or_jump()
-                else
-                fallback()
+            require('mason-lspconfig').setup_handlers {
+                function(server_name)
+                    require('lspconfig')[server_name].setup {
+                        capabilities = capabilities,
+                        on_attach = on_attach,
+                        settings = servers[server_name],
+                        filetypes = (servers[server_name] or {}).filetypes,
+                    }
                 end
-            end, { 'i', 's' }),
-            ['<S-Tab>'] = cmp.mapping(function(fallback)
-                if cmp.visible() then
-                cmp.select_prev_item()
-                elseif luasnip.locally_jumpable(-1) then
-                luasnip.jump(-1)
-                else
-                fallback()
-                end
-            end, { 'i', 's' }),
-            },
-            sources = {
-            { name = 'nvim_lsp' },
-            { name = 'luasnip' },
-            { name = 'path' },
-            },
-        }
-        
+            }
+
+            local luasnip = require 'luasnip'
+            require('luasnip.loaders.from_vscode').lazy_load()
+            luasnip.config.setup {}
+
+            -- See `:help cmp`
+            local cmp = require 'cmp'
+            cmp.setup {
+                snippet = {
+                    expand = function(args)
+                        luasnip.lsp_expand(args.body)
+                    end,
+                },
+                completion = {
+                    completeopt = 'menu,menuone,noinsert',
+                },
+                mapping = cmp.mapping.preset.insert {
+                    ['<C-n>'] = cmp.mapping.select_next_item(),
+                    ['<C-p>'] = cmp.mapping.select_prev_item(),
+                    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+                    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+                    ['<C-Space>'] = cmp.mapping.complete {},
+                    ['<CR>'] = cmp.mapping.confirm {
+                        behavior = cmp.ConfirmBehavior.Replace,
+                        select = true,
+                    },
+                    ['<Tab>'] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        elseif luasnip.expand_or_locally_jumpable() then
+                            luasnip.expand_or_jump()
+                        else
+                            fallback()
+                        end
+                    end, { 'i', 's' }),
+                    ['<S-Tab>'] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        elseif luasnip.locally_jumpable(-1) then
+                            luasnip.jump(-1)
+                        else
+                            fallback()
+                        end
+                    end, { 'i', 's' }),
+                },
+                sources = {
+                    { name = 'nvim_lsp' },
+                    { name = 'luasnip' },
+                    { name = 'path' },
+                },
+            }
         end
     }
 }
