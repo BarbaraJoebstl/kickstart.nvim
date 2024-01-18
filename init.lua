@@ -1,7 +1,5 @@
 --[[
 
-  explore Neovim!
-
   If you don't know anything about Lua, I recommend taking some time to read through
   a guide. One possible example:
   - https://learnxinyminutes.com/docs/lua/
@@ -45,13 +43,14 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-
 -- [[ Setting vim globals ]]
 require 'custom.vim-settings.vim-globals'
 -- [[ Setting vim keymaps ]]
 require 'custom.vim-settings.vim-keymaps'
 -- [[ Setting vim options ]]
 require 'custom.vim-settings.vim-options'
+-- [[ Setting highlight yank ]]
+require 'custom.vim-settings.vim-highlight-yank'
 
 -- [[ Configure plugins ]]
 -- NOTE: Here is where you install your plugins.
@@ -66,17 +65,6 @@ require('lazy').setup({
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim',  opts = {} },
 }, {})
-
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
 
 if vim.loop.os_uname().sysname == 'Darwin' then
   vim.o.shell = '/opt/homebrew/bin/fish'

@@ -3,6 +3,7 @@ local servers = {
     gopls = {},
     templ = {},
     pyright = {},
+    -- jsonls = {},
     -- rust_analyzer = {},
     -- tsserver = {},
     -- html = { filetypes = { 'html', 'twig', 'hbs'} },
