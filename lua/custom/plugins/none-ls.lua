@@ -9,7 +9,7 @@ return {
       sources = {
         -- formatting
         null_ls.builtins.formatting.stylua,
-        null_ls.builtins.formatting.ruff_format.with { extra_args = { 'line-length', '40' } },
+        null_ls.builtins.formatting.ruff_format,
         -- diagnostigs
         null_ls.builtins.diagnostics.ruff,
       },
