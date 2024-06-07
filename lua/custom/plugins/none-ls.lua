@@ -9,9 +9,7 @@ return {
       sources = {
         -- formatting
         null_ls.builtins.formatting.stylua,
-        null_ls.builtins.formatting.ruff_format,
-        -- diagnostigs
-        null_ls.builtins.diagnostics.ruff,
+        null_ls.builtins.formatting.yapf,
       },
       on_attach = function(client, bufnr)
         if client.supports_method 'textDocument/formatting' then
